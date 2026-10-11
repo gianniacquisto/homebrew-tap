@@ -1,8 +1,8 @@
 class Tandem < Formula
   desc "Todo app for humans and agents on the same Mac"
   homepage "https://github.com/gianniacquisto/tandem"
-  url "https://github.com/gianniacquisto/tandem/archive/refs/tags/v0.3.0.tar.gz"
-  sha256 "8f7323eb9f1ea5df566415ce17e5c652a8178f8e675b29e33e5c7b67f0644f62"
+  url "https://github.com/gianniacquisto/tandem/archive/refs/tags/v0.4.0.tar.gz"
+  sha256 "85a1edc86c84d4f244a85832234ce6d32529839f2d01cff3cee439830a71c03f"
   license "MIT"
 
   # Requires the Xcode Command Line Tools (`xcode-select --install`).
