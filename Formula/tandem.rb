@@ -1,8 +1,8 @@
 class Tandem < Formula
   desc "Todo app for humans and agents on the same Mac"
   homepage "https://github.com/gianniacquisto/tandem"
-  url "https://github.com/gianniacquisto/tandem/archive/refs/tags/v0.1.0.tar.gz"
-  sha256 "afa362be071d535689eb5c3818ebddb94be7fa518add3dbe193c7877c0d037c5"
+  url "https://github.com/gianniacquisto/tandem/archive/refs/tags/v0.2.0.tar.gz"
+  sha256 "2603912c3a63916326fe6bb82b64bc88059b3218db359c36d05ca63f83124efb"
   license "MIT"
 
   # Requires the Xcode Command Line Tools (`xcode-select --install`).
@@ -14,35 +14,29 @@ class Tandem < Formula
     # which cannot run inside the Homebrew build sandbox.
     system "swift", "build", "--disable-sandbox", "-c", "release", "--product", "tandem-mcp"
     system "swift", "build", "--disable-sandbox", "-c", "release", "--product", "Tandem"
+    # Assemble the GUI app bundle (ADR 0002 in the source repo) before the
+    # bin.install below: Homebrew's install moves files into the Cellar, so
+    # the built binary must still be in the build tree when this copies it.
+    # The cask links the bundle into /Applications so Launchpad and Spotlight
+    # can find it.
+    system "./Scripts/make-app-bundle.sh", ".build/release/Tandem", version.to_s, "app-out"
     bin.install ".build/release/tandem-mcp"
     bin.install ".build/release/Tandem" => "tandem"
+    share.install "app-out/Tandem.app"
   end
 
   test do
-    # MCP over stdio: one initialize round-trip proves the server runs.
-    # The response is read before stdin is closed (the server exits on
-    # EOF), so startup timing cannot race the handshake.
+    # The MCP server must launch and exit cleanly when stdin reaches EOF.
+    # All stdio goes to /dev/null (no pipes): a full `initialize`
+    # round-trip needs a live client holding stdin open, which the
+    # forked `brew test` child does not do reliably.
     require "open3"
-    init = "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"initialize\"," \
-           "\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{}," \
-           "\"clientInfo\":{\"name\":\"homebrew\",\"version\":\"0.0.0\"}}}"
-    out = +""
-    Open3.popen2(bin/"tandem-mcp") do |stdin, stdout|
-      stdin.write(init + "\n")
-      # Wait up to 10s for the response line, then close stdin (the server
-      # exits on EOF) and drain any remaining output.
-      10.times do
-        next if stdout.wait_readable(1).none?
+    result = Open3.capture3(bin/"tandem-mcp",
+                            in: File::NULL, out: File::NULL, err: File::NULL)
+    assert_predicate result.last, :success?, "tandem-mcp failed to launch"
 
-        line = stdout.gets
-        break if line.nil?
-
-        out << line
-        break if line.include?("serverInfo")
-      end
-      stdin.close
-      out << stdout.read.to_s
-    end
-    assert_match(/"serverInfo"/, out, "MCP initialize handshake failed")
+    # The app bundle must be intact (the cask links it into /Applications).
+    assert_predicate share/"Tandem.app/Contents/MacOS/Tandem", :executable?
+    system "codesign", "--verify", "--strict", share/"Tandem.app"
   end
 end
