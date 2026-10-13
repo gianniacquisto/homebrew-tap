@@ -14,5 +14,5 @@ cask "tandem" do
 
   depends_on macos: :golden_gate
 
-  app "Tandem"
+  app "Tandem.app"
 end
