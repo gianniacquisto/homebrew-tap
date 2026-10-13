@@ -1,26 +1,18 @@
 cask "tandem" do
-  version "0.4.0"
-  sha256 "85a1edc86c84d4f244a85832234ce6d32529839f2d01cff3cee439830a71c03f"
+  version "0.5.0"
+  sha256 "00894c701ae7809d0ee89f30b19cba41d9966e0cf9d7761a1f8f184d63ee3db2"
 
-  url "https://github.com/gianniacquisto/tandem/archive/refs/tags/v#{version}.tar.gz"
+  url "https://github.com/gianniacquisto/tandem/releases/download/v#{version}/Tandem-#{version}.zip"
   name "Tandem"
   desc "Todo app shared by humans and agents"
   homepage "https://github.com/gianniacquisto/tandem"
 
-  # The formula in this same tap builds the app bundle; this cask only links
-  # it into /Applications, where Launchpad and Spotlight look (ADR 0002 in
-  # the source repo). The URL mirrors the formula's tarball so version and
-  # sha256 stay in sync with it; the bundle is not installed from that download.
-  depends_on formula: "gianniacquisto/tap/tandem"
-  depends_on macos: :tahoe
-
-  postflight_steps do
-    # A symlink at the versionless `opt` path, so `brew upgrade tandem` keeps
-    # the app current with no second upgrade path. On uninstall, Homebrew
-    # removes only a symlink pointing exactly at this source.
-    symlink "{{HOMEBREW_PREFIX}}/opt/tandem/share/Tandem.app",
-            "/Applications/Tandem.app",
-            overwrite:           true,
-            remove_on_uninstall: true
+  livecheck do
+    url "https://github.com/gianniacquisto/tandem/releases/latest"
+    strategy :github_latest
   end
+
+  depends_on macos: :golden_gate
+
+  app "Tandem"
 end
