@@ -1,6 +1,6 @@
 cask "tandem" do
-  version "0.5.0"
-  sha256 "00894c701ae7809d0ee89f30b19cba41d9966e0cf9d7761a1f8f184d63ee3db2"
+  version "0.6.0"
+  sha256 "43935bc5940237615ddbb1c60c2479a32587baaebd18f7c40842a60f32bfca31"
 
   url "https://github.com/gianniacquisto/tandem/releases/download/v#{version}/Tandem-#{version}.zip"
   name "Tandem"
@@ -12,7 +12,7 @@ cask "tandem" do
     strategy :github_latest
   end
 
-  depends_on macos: :golden_gate
+  depends_on macos: :tahoe
 
   app "Tandem.app"
 end
