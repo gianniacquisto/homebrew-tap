@@ -14,5 +14,8 @@ cask "tandem" do
 
   depends_on macos: :golden_gate
 
+  # The agent-facing CLI the app bundles. The skills and the agent prompts call
+  # it by name, so it has to be on PATH for the workflow to work.
   app "Tandem.app"
+  binary "#{appdir}/Tandem.app/Contents/MacOS/tandem-cli"
 end
