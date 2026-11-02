@@ -1,6 +1,6 @@
 cask "tandem" do
-  version "1.3.0"
-  sha256 "a6fb116b4de53392949c537ef0c8f3375eba30d09ff2f1b3eacebfe5a0293e82"
+  version "1.4.0"
+  sha256 "fc3e14b460d93841f8c637c9cb912db4938b06e32365d7195ba381f486066289"
 
   url "https://github.com/gianniacquisto/tandem/releases/download/v#{version}/Tandem-#{version}.zip"
   name "Tandem"
